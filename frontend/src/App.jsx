@@ -1,24 +1,26 @@
 import { useState } from 'react';
-import './App.css'; // We'll add some basic styles next
+// 1. Import the Syntax Highlighter and a nice dark theme
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import './App.css';
 
 function App() {
-  // Request State
+  // ... (keep all your existing state and handleSend logic exactly the same) ...
   const [method, setMethod] = useState('GET');
   const [url, setUrl] = useState('https://jsonplaceholder.typicode.com/todos/1');
   const [headers, setHeaders] = useState('{\n  "Accept": "application/json"\n}');
   const [body, setBody] = useState('');
 
-  // Response State
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSend = async () => {
+    // ... (keep your existing handleSend logic) ...
     setLoading(true);
     setError(null);
     setResponse(null);
 
-    // Parse headers and body from string to JSON objects
     let parsedHeaders = null;
     let parsedBody = null;
 
@@ -31,7 +33,6 @@ function App() {
       return;
     }
 
-    // Build the ApiRequest payload
     const apiRequest = {
       url: url,
       method: method,
@@ -57,11 +58,11 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* ... (keep your existing header and url-bar) ... */}
       <header className="header">
         <h1>🚀 Fake Postman</h1>
       </header>
 
-      {/* Top Bar: Method, URL, Send Button */}
       <div className="url-bar">
         <select value={method} onChange={(e) => setMethod(e.target.value)} className="method-select">
           <option value="GET">GET</option>
@@ -83,7 +84,7 @@ function App() {
       </div>
 
       <div className="main-content">
-        {/* Left Side: Request Config */}
+        {/* ... (keep your existing request-pane) ... */}
         <div className="request-pane">
           <h3>Request Headers (JSON)</h3>
           <textarea
@@ -100,7 +101,6 @@ function App() {
           />
         </div>
 
-        {/* Right Side: Response View */}
         <div className="response-pane">
           <h3>Response</h3>
           {error && <div className="error-box">{error}</div>}
@@ -114,14 +114,24 @@ function App() {
               </div>
 
               <h4>Body</h4>
-              <pre className="response-box">
+              {/* 2. Replace <pre> with SyntaxHighlighter for the Body */}
+              <SyntaxHighlighter
+                language="json"
+                style={vscDarkPlus}
+                customStyle={{ borderRadius: '6px', margin: 0, border: '1px solid #555', background: '#1e1e1e' }}
+              >
                 {JSON.stringify(response.body, null, 2)}
-              </pre>
+              </SyntaxHighlighter>
 
               <h4>Headers</h4>
-              <pre className="response-box">
+              {/* 3. Replace <pre> with SyntaxHighlighter for the Headers */}
+              <SyntaxHighlighter
+                language="json"
+                style={vscDarkPlus}
+                customStyle={{ borderRadius: '6px', margin: 0, border: '1px solid #555', background: '#1e1e1e' }}
+              >
                 {JSON.stringify(response.headers, null, 2)}
-              </pre>
+              </SyntaxHighlighter>
             </div>
           )}
           {!response && !error && !loading && (
