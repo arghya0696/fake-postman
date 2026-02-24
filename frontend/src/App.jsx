@@ -7,7 +7,7 @@ function App() {
   const [method, setMethod] = useState('GET');
   const [url, setUrl] = useState('https://jsonplaceholder.typicode.com/todos/1');
 
-  // 1. Change headers state to an array of key-value objects
+  // Change headers state to an array of key-value objects
   const [headers, setHeaders] = useState([{ key: 'Accept', value: 'application/json' }]);
   const [body, setBody] = useState('');
 
@@ -30,14 +30,25 @@ function App() {
     const updatedHeaders = headers.filter((_, i) => i !== index);
     setHeaders(updatedHeaders);
   };
-  // -----------------------------------
+
+  // --- Formatter Function ---
+  const handlePrettify = () => {
+    if (!body.trim()) return;
+    try {
+      const parsedJSON = JSON.parse(body);
+      setBody(JSON.stringify(parsedJSON, null, 2));
+      setError(null);
+    } catch (err) {
+      setError("Cannot prettify: Invalid JSON format in Request Body.");
+    }
+  };
 
   const handleSend = async () => {
     setLoading(true);
     setError(null);
     setResponse(null);
 
-    // 2. Convert header rows array back into a standard object
+    // Convert header rows array back into a standard object
     let parsedHeaders = {};
     headers.forEach(h => {
       if (h.key.trim() !== '') {
@@ -105,9 +116,9 @@ function App() {
 
       <div className="main-content">
         <div className="request-pane">
-          <h3>Request Headers</h3>
 
-          {/* 3. Render dynamic rows for headers */}
+          {/* --- HEADERS SECTION --- */}
+          <h3>Request Headers</h3>
           <div className="headers-container">
             {headers.map((header, index) => (
               <div key={index} className="kv-row">
@@ -133,11 +144,16 @@ function App() {
             <button onClick={addHeaderRow} className="add-btn">+ Add Header</button>
           </div>
 
-          <h3>Request Body (JSON)</h3>
+          {/* --- BODY SECTION --- */}
+          <div className="section-header">
+            <h3>Request Body (JSON)</h3>
+            <button onClick={handlePrettify} className="prettify-btn">✨ Prettify</button>
+          </div>
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder='{"key": "value"}'
+            className="body-textarea"
           />
         </div>
 

@@ -1,6 +1,107 @@
-/* --- Key-Value Header Editor Styles --- */
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #111111;
+  color: #d4d4d4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  height: 90vh;
+  background-color: #1e1e1e;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid #333;
+}
+
+.header h1 {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  color: #fff;
+}
+
+.url-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.method-select {
+  padding: 12px;
+  font-weight: bold;
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 6px;
+}
+
+.url-input {
+  flex: 1;
+  padding: 12px;
+  background: #252526;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.send-btn {
+  padding: 10px 30px;
+  background: #0e639c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s ease;
+}
+
+.send-btn:hover { background: #1177bb; }
+.send-btn:disabled { background: #555; cursor: not-allowed; }
+
+.main-content {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.request-pane, .response-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: #252526;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+h3 {
+  margin-top: 0;
+  color: #fff;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+h4 { margin: 15px 0 5px 0; color: #ccc; }
+
+/* --- Headers Dynamic Input Styles --- */
 .headers-container {
-  margin-bottom: 25px;
+  margin-bottom: 10px;
 }
 
 .kv-row {
@@ -20,26 +121,22 @@
   font-size: 14px;
 }
 
-.kv-input:focus {
-  outline: none;
-  border-color: #0e639c;
-}
+.kv-input:focus { outline: none; border-color: #4daafc; }
 
 .remove-btn {
-  background: #5a1d1d;
-  color: #f48771;
-  border: 1px solid #f48771;
+  background: transparent;
+  color: #666;
+  border: 1px solid transparent;
   border-radius: 6px;
   cursor: pointer;
   padding: 0 15px;
   font-weight: bold;
-  font-size: 16px;
   transition: all 0.2s ease;
 }
 
 .remove-btn:hover {
-  background: #7a2626;
-  color: #fff;
+  background: rgba(244, 135, 113, 0.1);
+  color: #f48771;
 }
 
 .add-btn {
@@ -49,26 +146,29 @@
   padding: 8px 15px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
+  margin-bottom: 15px;
   transition: background 0.2s ease;
 }
 
-.add-btn:hover {
-  background: rgba(77, 170, 252, 0.1);
+.add-btn:hover { background: rgba(77, 170, 252, 0.1); }
+
+/* --- Request Body & Prettify Layout --- */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
-* --- Body Tab & Prettify Button Styles --- */
-.body-tab-container {
-  display: flex;
-  flex-direction: column;
-  flex: 1; /* Ensures the container takes up the remaining vertical space */
-}
-
-.body-actions {
-  display: flex;
-  justify-content: flex-end; /* Pushes the button to the right */
-  margin-bottom: 8px;
+.section-header h3 {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin: 0;
 }
 
 .prettify-btn {
@@ -81,18 +181,43 @@
   font-size: 13px;
   font-weight: 600;
   transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .prettify-btn:hover {
   background: #0e639c;
   color: #fff;
-  box-shadow: 0 0 8px rgba(77, 170, 252, 0.4); /* Slight glow effect */
 }
 
-/* Adjust the textarea margin since the button wrapper handles the spacing now */
 .body-textarea {
-  margin-bottom: 0;
+  flex: 1;
+  width: 100%;
+  min-height: 200px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 12px;
+  font-family: monospace;
+  resize: vertical;
+  margin-bottom: 15px;
 }
+
+.body-textarea:focus { outline: none; border-color: #4daafc; }
+
+/* --- Response Pane Styles --- */
+.response-box {
+  background: #1e1e1e;
+  border: 1px solid #555;
+  padding: 15px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: monospace;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.status-bar { margin-bottom: 15px; font-weight: bold; font-size: 18px; }
+.status-ok { color: #89d185; }
+.status-err { color: #f48771; }
+.error-box { background: #5a1d1d; color: #f48771; padding: 12px; border-radius: 6px; border: 1px solid #f48771; }
+.empty-state { color: #888; text-align: center; margin-top: 50px; font-size: 16px; }
