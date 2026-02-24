@@ -2,14 +2,22 @@ package com.postman.fake_postman.service;
 
 import com.postman.fake_postman.model.ApiRequest;
 import com.postman.fake_postman.model.ApiResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import tools.jackson.databind.ObjectMapper;
 
+import java.nio.charset.Charset;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ApiService {
@@ -39,15 +47,27 @@ public class ApiService {
             ResponseEntity<String> response = bodySpec.retrieve().toEntity(String.class);
             return new ApiResponse(
                     response.getStatusCode().value(),
-                    parseBody(response.getBody())
-            );
+                    parseBody(response.getBody()),
+                    createHeaders(response.getHeaders()));
 
         } catch (RestClientResponseException e) {
             return new ApiResponse(
                     e.getStatusCode().value(),
-                    parseBody(e.getResponseBodyAsString())
+                    parseBody(e.getResponseBodyAsString()),
+                    createHeaders(e.getResponseHeaders())
             );
         }
+    }
+
+    private Map<String, Object> createHeaders(HttpHeaders headers) {
+
+        final Optional<Charset> contentType = Optional
+                .ofNullable(headers.getContentType())
+                .map(MimeType::getCharset);
+
+        return Map.of("contentType", contentType,
+                "date", Instant.ofEpochMilli(headers.getDate()).atZone(ZoneId.systemDefault()).toLocalDate(),
+                "connection", headers.getConnection());
     }
 
     private boolean supportsBody(final HttpMethod method) {
