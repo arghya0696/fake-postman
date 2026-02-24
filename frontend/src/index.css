@@ -1,68 +1,98 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* --- Key-Value Header Editor Styles --- */
+.headers-container {
+  margin-bottom: 25px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
+.kv-row {
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.kv-input {
+  flex: 1;
+  padding: 10px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: 1px solid #555;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 14px;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+.kv-input:focus {
+  outline: none;
+  border-color: #0e639c;
+}
+
+.remove-btn {
+  background: #5a1d1d;
+  color: #f48771;
+  border: 1px solid #f48771;
+  border-radius: 6px;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  padding: 0 15px;
+  font-weight: bold;
+  font-size: 16px;
+  transition: all 0.2s ease;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.remove-btn:hover {
+  background: #7a2626;
+  color: #fff;
+}
+
+.add-btn {
+  background: transparent;
+  color: #4daafc;
+  border: 1px dashed #4daafc;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.add-btn:hover {
+  background: rgba(77, 170, 252, 0.1);
+}
+
+* --- Body Tab & Prettify Button Styles --- */
+.body-tab-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Ensures the container takes up the remaining vertical space */
+}
+
+.body-actions {
+  display: flex;
+  justify-content: flex-end; /* Pushes the button to the right */
+  margin-bottom: 8px;
+}
+
+.prettify-btn {
+  background: #2b3d4d;
+  color: #4daafc;
+  border: 1px solid #0e639c;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prettify-btn:hover {
+  background: #0e639c;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(77, 170, 252, 0.4); /* Slight glow effect */
+}
+
+/* Adjust the textarea margin since the button wrapper handles the spacing now */
+.body-textarea {
+  margin-bottom: 0;
 }

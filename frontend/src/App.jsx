@@ -1,34 +1,55 @@
 import { useState } from 'react';
-// 1. Import the Syntax Highlighter and a nice dark theme
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './App.css';
 
 function App() {
-  // ... (keep all your existing state and handleSend logic exactly the same) ...
   const [method, setMethod] = useState('GET');
   const [url, setUrl] = useState('https://jsonplaceholder.typicode.com/todos/1');
-  const [headers, setHeaders] = useState('{\n  "Accept": "application/json"\n}');
+
+  // 1. Change headers state to an array of key-value objects
+  const [headers, setHeaders] = useState([{ key: 'Accept', value: 'application/json' }]);
   const [body, setBody] = useState('');
 
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // --- Header Management Functions ---
+  const handleHeaderChange = (index, field, newValue) => {
+    const updatedHeaders = [...headers];
+    updatedHeaders[index][field] = newValue;
+    setHeaders(updatedHeaders);
+  };
+
+  const addHeaderRow = () => {
+    setHeaders([...headers, { key: '', value: '' }]);
+  };
+
+  const removeHeaderRow = (index) => {
+    const updatedHeaders = headers.filter((_, i) => i !== index);
+    setHeaders(updatedHeaders);
+  };
+  // -----------------------------------
+
   const handleSend = async () => {
-    // ... (keep your existing handleSend logic) ...
     setLoading(true);
     setError(null);
     setResponse(null);
 
-    let parsedHeaders = null;
-    let parsedBody = null;
+    // 2. Convert header rows array back into a standard object
+    let parsedHeaders = {};
+    headers.forEach(h => {
+      if (h.key.trim() !== '') {
+        parsedHeaders[h.key.trim()] = h.value.trim();
+      }
+    });
 
+    let parsedBody = null;
     try {
-      if (headers.trim()) parsedHeaders = JSON.parse(headers);
       if (body.trim()) parsedBody = JSON.parse(body);
     } catch (err) {
-      setError("Invalid JSON format in Headers or Body input.");
+      setError("Invalid JSON format in Request Body.");
       setLoading(false);
       return;
     }
@@ -36,7 +57,7 @@ function App() {
     const apiRequest = {
       url: url,
       method: method,
-      headers: parsedHeaders,
+      headers: Object.keys(parsedHeaders).length > 0 ? parsedHeaders : null,
       body: parsedBody
     };
 
@@ -58,7 +79,6 @@ function App() {
 
   return (
     <div className="app-container">
-      {/* ... (keep your existing header and url-bar) ... */}
       <header className="header">
         <h1>🚀 Fake Postman</h1>
       </header>
@@ -84,14 +104,34 @@ function App() {
       </div>
 
       <div className="main-content">
-        {/* ... (keep your existing request-pane) ... */}
         <div className="request-pane">
-          <h3>Request Headers (JSON)</h3>
-          <textarea
-            value={headers}
-            onChange={(e) => setHeaders(e.target.value)}
-            placeholder='{"Authorization": "Bearer token"}'
-          />
+          <h3>Request Headers</h3>
+
+          {/* 3. Render dynamic rows for headers */}
+          <div className="headers-container">
+            {headers.map((header, index) => (
+              <div key={index} className="kv-row">
+                <input
+                  type="text"
+                  placeholder="Key (e.g., Authorization)"
+                  value={header.key}
+                  onChange={(e) => handleHeaderChange(index, 'key', e.target.value)}
+                  className="kv-input"
+                />
+                <input
+                  type="text"
+                  placeholder="Value (e.g., Bearer token)"
+                  value={header.value}
+                  onChange={(e) => handleHeaderChange(index, 'value', e.target.value)}
+                  className="kv-input"
+                />
+                <button onClick={() => removeHeaderRow(index)} className="remove-btn" title="Remove Header">
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button onClick={addHeaderRow} className="add-btn">+ Add Header</button>
+          </div>
 
           <h3>Request Body (JSON)</h3>
           <textarea
@@ -114,7 +154,6 @@ function App() {
               </div>
 
               <h4>Body</h4>
-              {/* 2. Replace <pre> with SyntaxHighlighter for the Body */}
               <SyntaxHighlighter
                 language="json"
                 style={vscDarkPlus}
@@ -124,7 +163,6 @@ function App() {
               </SyntaxHighlighter>
 
               <h4>Headers</h4>
-              {/* 3. Replace <pre> with SyntaxHighlighter for the Headers */}
               <SyntaxHighlighter
                 language="json"
                 style={vscDarkPlus}
