@@ -18,6 +18,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Objects.isNull;
+
 @Service
 public class ApiService {
 
@@ -59,6 +62,9 @@ public class ApiService {
     }
 
     private Map<String, Object> createHeaders(HttpHeaders headers) {
+
+        if(isNull(headers))
+            return emptyMap();
 
         final Optional<Charset> contentType = Optional
                 .ofNullable(headers.getContentType())
