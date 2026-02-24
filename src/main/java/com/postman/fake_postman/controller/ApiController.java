@@ -19,8 +19,8 @@ public class ApiController {
     @PostMapping("/execute")
     public ResponseEntity<ApiResponse> executeDynamicRequest(@RequestBody ApiRequest apiRequest) {
         try {
-            System.out.println(Thread.currentThread().getName());
-            System.out.println("Is virtual: " + Thread.currentThread().isVirtual());
+//            System.out.println(Thread.currentThread().getName());
+//            System.out.println("Is virtual: " + Thread.currentThread().isVirtual());
             ApiResponse response = apiService.executeRequest(apiRequest);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
