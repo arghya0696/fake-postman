@@ -3,7 +3,6 @@ package com.postman.fake_postman.controller;
 import com.postman.fake_postman.model.ApiRequest;
 import com.postman.fake_postman.model.ApiResponse;
 import com.postman.fake_postman.service.ApiService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
