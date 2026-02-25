@@ -17,7 +17,6 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  /* 1. Widened the max container size to give everything more room */
   max-width: 1500px;
   height: 90vh;
   background-color: #1e1e1e;
@@ -56,6 +55,24 @@ body {
   border: 1px solid #555;
   border-radius: 6px;
   font-size: 16px;
+}
+
+/* --- URL Bar Buttons --- */
+.curl-main-btn {
+  padding: 10px 20px;
+  background: #2b3d4d;
+  color: #4daafc;
+  border: 1px solid #0e639c;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.curl-main-btn:hover {
+  background: #0e639c;
+  color: #fff;
 }
 
 .send-btn {
@@ -132,8 +149,8 @@ body {
 
 .history-item {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: space-between; /* Pushes the copy button to the right edge */
+  align-items: center;
   padding: 10px 8px;
   background: #1e1e1e;
   border: 1px solid #333;
@@ -146,6 +163,13 @@ body {
 .history-item:hover {
   border-color: #4daafc;
   background: #2a2a2a;
+}
+
+.history-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden; /* Prevents long URLs from pushing the copy button out */
 }
 
 .hist-method { font-size: 12px; font-weight: 800; }
@@ -163,8 +187,23 @@ body {
   text-overflow: ellipsis;
 }
 
+.hist-copy-btn {
+  background: transparent;
+  color: #888;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.hist-copy-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
 /* --- Content Panes --- */
-/* Base styles shared by both panes */
 .request-pane, .response-pane {
   display: flex;
   flex-direction: column;
@@ -175,14 +214,8 @@ body {
   border: 1px solid #333;
 }
 
-/* 2. Changed Flex Ratios: Request pane is now significantly wider than Response pane */
-.request-pane {
-  flex: 1.5;
-}
-
-.response-pane {
-  flex: 1;
-}
+.request-pane { flex: 1.5; }
+.response-pane { flex: 1; }
 
 h3 {
   margin-top: 0;
@@ -196,25 +229,16 @@ h4 { margin: 0; color: #ccc; }
 /* --- Headers Dynamic Input Styles --- */
 .headers-container { margin-bottom: 10px; }
 .kv-row { display: flex; gap: 10px; margin-bottom: 10px; }
-
-/* 3. Made the header inputs taller and the text larger */
 .kv-input {
-  flex: 1;
-  padding: 12px; /* Increased padding */
-  background: #1e1e1e; color: #d4d4d4;
-  border: 1px solid #555; border-radius: 6px;
-  font-family: monospace;
-  font-size: 15px; /* Increased font size */
+  flex: 1; padding: 12px; background: #1e1e1e; color: #d4d4d4;
+  border: 1px solid #555; border-radius: 6px; font-family: monospace; font-size: 15px;
 }
-
 .kv-input:focus { outline: none; border-color: #4daafc; }
-
 .remove-btn {
   background: transparent; color: #666; border: 1px solid transparent;
   border-radius: 6px; cursor: pointer; padding: 0 15px; font-weight: bold; transition: all 0.2s ease;
 }
 .remove-btn:hover { background: rgba(244, 135, 113, 0.1); color: #f48771; }
-
 .add-btn {
   background: transparent; color: #4daafc; border: 1px dashed #4daafc;
   padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; margin-bottom: 15px; transition: background 0.2s ease;
@@ -235,13 +259,8 @@ h4 { margin: 0; color: #ccc; }
   border-bottom: 1px solid #444; padding-bottom: 10px; margin-top: 15px; margin-bottom: 15px;
 }
 .section-header h3 { border-bottom: none; padding-bottom: 0; margin: 0; }
-
-/* 4. Increased the minimum height of the JSON box */
 .body-textarea {
-  flex: 1;
-  width: 100%;
-  min-height: 280px; /* Increased from 200px */
-  background: #1e1e1e; color: #d4d4d4;
+  flex: 1; width: 100%; min-height: 280px; background: #1e1e1e; color: #d4d4d4;
   border: 1px solid #555; border-radius: 6px; padding: 12px; font-family: monospace; resize: vertical; margin-bottom: 15px;
 }
 .body-textarea:focus { outline: none; border-color: #4daafc; }

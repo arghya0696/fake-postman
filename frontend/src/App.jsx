@@ -13,14 +13,16 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Copy States for visual feedback
   const [copiedReqBody, setCopiedReqBody] = useState(false);
   const [copiedResBody, setCopiedResBody] = useState(false);
   const [copiedResHeaders, setCopiedResHeaders] = useState(false);
+  const [copiedCurlMain, setCopiedCurlMain] = useState(false);
+  const [copiedHistoryId, setCopiedHistoryId] = useState(null); // Tracks which history item was copied
 
   // --- History State ---
   const [history, setHistory] = useState([]);
 
-  // Load history from localStorage on first render
   useEffect(() => {
     const savedHistory = localStorage.getItem('fake_postman_history');
     if (savedHistory) {
@@ -66,17 +68,57 @@ function App() {
     });
   };
 
+  // --- cURL Generation ---
+  const generateCurl = (reqMethod, reqUrl, reqHeaders, reqBody) => {
+    let curl = `curl --request ${reqMethod} \\\n  --url '${reqUrl}'`;
+
+    // Add valid headers
+    if (reqHeaders && reqHeaders.length > 0) {
+      reqHeaders.forEach(h => {
+        if (h.key.trim() && h.value.trim()) {
+          // Escape single quotes inside the header value safely
+          const safeValue = h.value.trim().replace(/'/g, "'\\''");
+          curl += ` \\\n  --header '${h.key.trim()}: ${safeValue}'`;
+        }
+      });
+    }
+
+    // Add body if it's not a GET request and body exists
+    if (reqBody && reqBody.trim() && reqMethod !== 'GET') {
+      const safeBody = reqBody.replace(/'/g, "'\\''");
+      curl += ` \\\n  --data '${safeBody}'`;
+    }
+
+    return curl;
+  };
+
+  const handleCopyCurlMain = () => {
+    const curlStr = generateCurl(method, url, headers, body);
+    navigator.clipboard.writeText(curlStr).then(() => {
+      setCopiedCurlMain(true);
+      setTimeout(() => setCopiedCurlMain(false), 2000);
+    });
+  };
+
+  const handleCopyCurlHistory = (e, item) => {
+    e.stopPropagation(); // Prevents loading the history item into the editor
+    const curlStr = generateCurl(item.method, item.url, item.headers, item.body);
+    navigator.clipboard.writeText(curlStr).then(() => {
+      setCopiedHistoryId(item.id);
+      setTimeout(() => setCopiedHistoryId(null), 2000);
+    });
+  };
+
   // --- History Management ---
   const saveToHistory = () => {
     const newEntry = {
-      id: Date.now(), // Unique ID based on timestamp
+      id: Date.now(),
       method,
       url,
-      headers, // Saving the exact UI state of headers
-      body,    // Saving the exact UI string of the body
+      headers,
+      body,
     };
 
-    // Add to beginning of array, and keep only the latest 20 items to save space
     const updatedHistory = [newEntry, ...history].slice(0, 20);
     setHistory(updatedHistory);
     localStorage.setItem('fake_postman_history', JSON.stringify(updatedHistory));
@@ -87,7 +129,6 @@ function App() {
     setUrl(item.url);
     setHeaders(item.headers || [{ key: '', value: '' }]);
     setBody(item.body || '');
-    // Clear current response when loading an old request
     setResponse(null);
     setError(null);
   };
@@ -135,8 +176,6 @@ function App() {
 
       const data = await res.json();
       setResponse(data);
-
-      // Save to history only if the request actually executed
       saveToHistory();
 
     } catch (err) {
@@ -152,6 +191,7 @@ function App() {
         <h1>🚀 Fake Postman</h1>
       </header>
 
+      {/* --- Top Bar --- */}
       <div className="url-bar">
         <select value={method} onChange={(e) => setMethod(e.target.value)} className="method-select">
           <option value="GET">GET</option>
@@ -167,6 +207,10 @@ function App() {
           className="url-input"
           placeholder="Enter request URL"
         />
+        {/* New Copy cURL Button for Main Editor */}
+        <button onClick={handleCopyCurlMain} className="curl-main-btn" title="Copy as cURL">
+          {copiedCurlMain ? '✅ cURL Copied' : '📋 cURL'}
+        </button>
         <button onClick={handleSend} disabled={loading} className="send-btn">
           {loading ? 'Sending...' : 'Send'}
         </button>
@@ -174,7 +218,7 @@ function App() {
 
       <div className="main-content">
 
-        {/* --- History Sidebar (NEW) --- */}
+        {/* --- History Sidebar --- */}
         <div className="history-sidebar">
           <div className="history-header">
             <h3>History</h3>
@@ -188,8 +232,18 @@ function App() {
             ) : (
               history.map((item) => (
                 <div key={item.id} className="history-item" onClick={() => loadFromHistory(item)}>
-                  <span className={`hist-method method-${item.method}`}>{item.method}</span>
-                  <span className="hist-url" title={item.url}>{item.url}</span>
+                  <div className="history-item-content">
+                    <span className={`hist-method method-${item.method}`}>{item.method}</span>
+                    <span className="hist-url" title={item.url}>{item.url}</span>
+                  </div>
+                  {/* New Copy cURL Button for History Item */}
+                  <button
+                    className="hist-copy-btn"
+                    onClick={(e) => handleCopyCurlHistory(e, item)}
+                    title="Copy cURL"
+                  >
+                    {copiedHistoryId === item.id ? '✅' : '📋'}
+                  </button>
                 </div>
               ))
             )}
