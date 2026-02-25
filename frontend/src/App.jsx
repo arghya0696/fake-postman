@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './App.css';
@@ -6,8 +6,6 @@ import './App.css';
 function App() {
   const [method, setMethod] = useState('GET');
   const [url, setUrl] = useState('https://jsonplaceholder.typicode.com/todos/1');
-
-  // Change headers state to an array of key-value objects
   const [headers, setHeaders] = useState([{ key: 'Accept', value: 'application/json' }]);
   const [body, setBody] = useState('');
 
@@ -15,10 +13,20 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Copy States for visual feedback
   const [copiedReqBody, setCopiedReqBody] = useState(false);
   const [copiedResBody, setCopiedResBody] = useState(false);
   const [copiedResHeaders, setCopiedResHeaders] = useState(false);
+
+  // --- History State ---
+  const [history, setHistory] = useState([]);
+
+  // Load history from localStorage on first render
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('fake_postman_history');
+    if (savedHistory) {
+      setHistory(JSON.parse(savedHistory));
+    }
+  }, []);
 
   // --- Header Management Functions ---
   const handleHeaderChange = (index, field, newValue) => {
@@ -50,21 +58,51 @@ function App() {
 
   const handleCopy = (content, setCopiedState) => {
     if (!content) return;
-    // If the content is an object (like response.body), stringify it nicely first
     const textToCopy = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       setCopiedState(true);
-      setTimeout(() => setCopiedState(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopiedState(false), 2000);
     });
   };
 
+  // --- History Management ---
+  const saveToHistory = () => {
+    const newEntry = {
+      id: Date.now(), // Unique ID based on timestamp
+      method,
+      url,
+      headers, // Saving the exact UI state of headers
+      body,    // Saving the exact UI string of the body
+    };
+
+    // Add to beginning of array, and keep only the latest 20 items to save space
+    const updatedHistory = [newEntry, ...history].slice(0, 20);
+    setHistory(updatedHistory);
+    localStorage.setItem('fake_postman_history', JSON.stringify(updatedHistory));
+  };
+
+  const loadFromHistory = (item) => {
+    setMethod(item.method);
+    setUrl(item.url);
+    setHeaders(item.headers || [{ key: '', value: '' }]);
+    setBody(item.body || '');
+    // Clear current response when loading an old request
+    setResponse(null);
+    setError(null);
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem('fake_postman_history');
+  };
+
+  // --- API Execution ---
   const handleSend = async () => {
     setLoading(true);
     setError(null);
     setResponse(null);
 
-    // Convert header rows array back into a standard object
     let parsedHeaders = {};
     headers.forEach(h => {
       if (h.key.trim() !== '') {
@@ -97,6 +135,10 @@ function App() {
 
       const data = await res.json();
       setResponse(data);
+
+      // Save to history only if the request actually executed
+      saveToHistory();
+
     } catch (err) {
       setError("Failed to connect to the backend proxy.");
     } finally {
@@ -131,8 +173,30 @@ function App() {
       </div>
 
       <div className="main-content">
-        <div className="request-pane">
 
+        {/* --- History Sidebar (NEW) --- */}
+        <div className="history-sidebar">
+          <div className="history-header">
+            <h3>History</h3>
+            {history.length > 0 && (
+              <button onClick={clearHistory} className="clear-history-btn">Clear</button>
+            )}
+          </div>
+          <div className="history-list">
+            {history.length === 0 ? (
+              <div className="empty-history">No history yet.</div>
+            ) : (
+              history.map((item) => (
+                <div key={item.id} className="history-item" onClick={() => loadFromHistory(item)}>
+                  <span className={`hist-method method-${item.method}`}>{item.method}</span>
+                  <span className="hist-url" title={item.url}>{item.url}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="request-pane">
           {/* --- HEADERS SECTION --- */}
           <h3>Request Headers</h3>
           <div className="headers-container">
@@ -152,9 +216,7 @@ function App() {
                   onChange={(e) => handleHeaderChange(index, 'value', e.target.value)}
                   className="kv-input"
                 />
-                <button onClick={() => removeHeaderRow(index)} className="remove-btn" title="Remove Header">
-                  ✕
-                </button>
+                <button onClick={() => removeHeaderRow(index)} className="remove-btn" title="Remove Header">✕</button>
               </div>
             ))}
             <button onClick={addHeaderRow} className="add-btn">+ Add Header</button>
