@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  fake-postman:
+    # Tells Docker Compose to build the image using the Dockerfile in this directory
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fake-postman-app:latest
+    container_name: fake-postman
+    ports:
+      # Maps port 8080 on your actual machine to port 8080 inside the container
+      - "8080:8080"
+    restart: unless-stopped
