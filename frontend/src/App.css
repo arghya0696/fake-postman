@@ -3,10 +3,9 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* 1. Center the app window on the screen */
 body {
   margin: 0;
-  background-color: #111111; /* Slightly darker background outside the app */
+  background-color: #111111;
   color: #d4d4d4;
   display: flex;
   justify-content: center;
@@ -14,17 +13,16 @@ body {
   min-height: 100vh;
 }
 
-/* 2. Constrain the app size and make it look like a floating window */
 .app-container {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 1200px; /* Prevents it from getting too wide on huge screens */
-  height: 90vh;      /* Leaves a nice 5% gap at the top and bottom */
+  max-width: 1200px;
+  height: 90vh;
   background-color: #1e1e1e;
   padding: 25px;
   border-radius: 12px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); /* Adds a deep shadow */
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
   border: 1px solid #333;
 }
 
@@ -99,12 +97,107 @@ h3 {
   padding-bottom: 10px;
 }
 
-h4 { margin: 15px 0 5px 0; color: #ccc; }
+h4 { margin: 0; color: #ccc; }
 
-textarea {
+/* --- Headers Dynamic Input Styles --- */
+.headers-container {
+  margin-bottom: 10px;
+}
+
+.kv-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.kv-input {
+  flex: 1;
+  padding: 10px;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border: 1px solid #555;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.kv-input:focus { outline: none; border-color: #4daafc; }
+
+.remove-btn {
+  background: transparent;
+  color: #666;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0 15px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: rgba(244, 135, 113, 0.1);
+  color: #f48771;
+}
+
+.add-btn {
+  background: transparent;
+  color: #4daafc;
+  border: 1px dashed #4daafc;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  transition: background 0.2s ease;
+}
+
+.add-btn:hover { background: rgba(77, 170, 252, 0.1); }
+
+/* --- Reusable Action Buttons (Copy & Prettify) --- */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  background: #2b3d4d;
+  color: #4daafc;
+  border: 1px solid #0e639c;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #0e639c;
+  color: #fff;
+}
+
+/* --- Request Body Layout --- */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.section-header h3 {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin: 0;
+}
+
+.body-textarea {
   flex: 1;
   width: 100%;
-  min-height: 120px;
+  min-height: 200px;
   background: #1e1e1e;
   color: #d4d4d4;
   border: 1px solid #555;
@@ -113,6 +206,16 @@ textarea {
   font-family: monospace;
   resize: vertical;
   margin-bottom: 15px;
+}
+
+.body-textarea:focus { outline: none; border-color: #4daafc; }
+
+/* --- Response Pane Styles --- */
+.response-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 15px 0 8px 0;
 }
 
 .response-box {

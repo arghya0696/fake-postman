@@ -15,6 +15,11 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Copy States for visual feedback
+  const [copiedReqBody, setCopiedReqBody] = useState(false);
+  const [copiedResBody, setCopiedResBody] = useState(false);
+  const [copiedResHeaders, setCopiedResHeaders] = useState(false);
+
   // --- Header Management Functions ---
   const handleHeaderChange = (index, field, newValue) => {
     const updatedHeaders = [...headers];
@@ -31,7 +36,7 @@ function App() {
     setHeaders(updatedHeaders);
   };
 
-  // --- Formatter Function ---
+  // --- Utilities ---
   const handlePrettify = () => {
     if (!body.trim()) return;
     try {
@@ -41,6 +46,17 @@ function App() {
     } catch (err) {
       setError("Cannot prettify: Invalid JSON format in Request Body.");
     }
+  };
+
+  const handleCopy = (content, setCopiedState) => {
+    if (!content) return;
+    // If the content is an object (like response.body), stringify it nicely first
+    const textToCopy = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      setCopiedState(true);
+      setTimeout(() => setCopiedState(false), 2000); // Reset after 2 seconds
+    });
   };
 
   const handleSend = async () => {
@@ -147,7 +163,12 @@ function App() {
           {/* --- BODY SECTION --- */}
           <div className="section-header">
             <h3>Request Body (JSON)</h3>
-            <button onClick={handlePrettify} className="prettify-btn">✨ Prettify</button>
+            <div className="action-buttons">
+              <button onClick={handlePrettify} className="action-btn">✨ Prettify</button>
+              <button onClick={() => handleCopy(body, setCopiedReqBody)} className="action-btn">
+                {copiedReqBody ? '✅ Copied!' : '📋 Copy'}
+              </button>
+            </div>
           </div>
           <textarea
             value={body}
@@ -169,7 +190,13 @@ function App() {
                 </span>
               </div>
 
-              <h4>Body</h4>
+              {/* Response Body */}
+              <div className="response-section-header">
+                <h4>Body</h4>
+                <button onClick={() => handleCopy(response.body, setCopiedResBody)} className="action-btn">
+                  {copiedResBody ? '✅ Copied!' : '📋 Copy'}
+                </button>
+              </div>
               <SyntaxHighlighter
                 language="json"
                 style={vscDarkPlus}
@@ -178,7 +205,13 @@ function App() {
                 {JSON.stringify(response.body, null, 2)}
               </SyntaxHighlighter>
 
-              <h4>Headers</h4>
+              {/* Response Headers */}
+              <div className="response-section-header">
+                <h4>Headers</h4>
+                <button onClick={() => handleCopy(response.headers, setCopiedResHeaders)} className="action-btn">
+                  {copiedResHeaders ? '✅ Copied!' : '📋 Copy'}
+                </button>
+              </div>
               <SyntaxHighlighter
                 language="json"
                 style={vscDarkPlus}
